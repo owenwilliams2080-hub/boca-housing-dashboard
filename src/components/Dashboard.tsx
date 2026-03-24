@@ -121,7 +121,7 @@ export default function Dashboard({ region }: DashboardProps) {
         )}
 
         {/* ===== Time range filter (sticky — stays visible while scrolling) ===== */}
-        <div className="sticky top-0 z-10 bg-gray-50 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 py-4 -mt-4 mb-4 border-b border-gray-200">
+        <div className="sticky top-[45px] z-10 bg-gray-50 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 py-4 -mt-4 mb-4 border-b border-gray-200">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <h2 className="text-lg font-semibold text-gray-700">
               Market Overview
