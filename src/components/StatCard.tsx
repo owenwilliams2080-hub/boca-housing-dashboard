@@ -11,9 +11,10 @@ import { ChartDataPoint, SeriesConfig } from "@/types";
 interface StatCardProps {
   config: SeriesConfig;
   data: ChartDataPoint[];
+  onClickScroll?: () => void;
 }
 
-export default function StatCard({ config, data }: StatCardProps) {
+export default function StatCard({ config, data, onClickScroll }: StatCardProps) {
   // Grab the most recent data point
   const latest = data[data.length - 1];
   if (!latest) return null;
@@ -32,9 +33,18 @@ export default function StatCard({ config, data }: StatCardProps) {
   const isNegative = hasYoy && yoy < 0;
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
-      {/* Series name */}
-      <p className="text-sm font-medium text-gray-500 mb-1">{config.name}</p>
+    <div
+      onClick={onClickScroll}
+      className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 cursor-pointer hover:shadow-lg hover:border-blue-200 hover:-translate-y-0.5 transition-all group"
+    >
+      <div className="flex items-start justify-between">
+        {/* Series name */}
+        <p className="text-sm font-medium text-gray-500 mb-1">{config.name}</p>
+        {/* Down-arrow hint — visible on hover */}
+        <span className="text-gray-300 group-hover:text-blue-400 transition-colors text-lg leading-none">
+          &#8595;
+        </span>
+      </div>
 
       {/* Latest value — the big number */}
       <p className="text-2xl font-bold text-gray-900">{formattedValue}</p>

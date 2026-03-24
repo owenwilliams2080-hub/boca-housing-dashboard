@@ -152,6 +152,9 @@ export default function Dashboard({ region }: DashboardProps) {
                       key={series.config.id}
                       config={series.config}
                       data={filterByTimeRange(series.data, timeRange)}
+                      onClickScroll={() => {
+                        document.getElementById(`chart-${series.config.id}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+                      }}
                     />
                   )
               )}
@@ -179,11 +182,12 @@ export default function Dashboard({ region }: DashboardProps) {
                 }
                 if (series.data.length === 0) return null;
                 return (
-                  <ChartCard
-                    key={series.config.id}
-                    config={series.config}
-                    data={filterByTimeRange(series.data, timeRange)}
-                  />
+                  <div key={series.config.id} id={`chart-${series.config.id}`}>
+                    <ChartCard
+                      config={series.config}
+                      data={filterByTimeRange(series.data, timeRange)}
+                    />
+                  </div>
                 );
               })}
         </div>
