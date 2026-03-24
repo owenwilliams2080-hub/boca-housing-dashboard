@@ -56,14 +56,30 @@ export default function HousingChart({
   const displayPrefix = dataKey === "yoyChange" ? "" : prefix;
   const displayDecimals = dataKey === "yoyChange" ? 1 : decimals;
 
-  // Smart label count: show fewer labels when there are fewer data points
-  // so they don't bunch up (especially on 1Y view with weekly data).
-  // Target ~5 evenly spaced labels, but never more than the data has.
+  // Smart label count: target ~5 evenly spaced labels
   const maxLabels = 5;
   const tickInterval = Math.max(
     0,
     Math.floor(chartData.length / maxLabels) - 1
   );
+
+  // Detect annual data: if the gap between the first two points is
+  // roughly a year (~300+ days), show just the year instead of "Jan 2021"
+  const isAnnual =
+    chartData.length >= 2 &&
+    Math.abs(
+      new Date(chartData[1].date).getTime() -
+        new Date(chartData[0].date).getTime()
+    ) >
+      300 * 24 * 60 * 60 * 1000;
+
+  // Format label: "2021" for annual data, "Mar 2025" for everything else
+  const tickFormatter = (dateStr: string) => {
+    if (isAnnual) {
+      return new Date(dateStr + "T00:00:00").getFullYear().toString();
+    }
+    return formatDate(dateStr);
+  };
 
   return (
     <ResponsiveContainer width="100%" height={280}>
@@ -77,7 +93,7 @@ export default function HousingChart({
         {/* X axis: dates — always flat, never angled */}
         <XAxis
           dataKey="date"
-          tickFormatter={formatDate}
+          tickFormatter={tickFormatter}
           tick={{ fontSize: 12, fill: "#9ca3af" }}
           tickLine={false}
           axisLine={{ stroke: "#e5e7eb" }}
