@@ -20,6 +20,7 @@ export interface ChartDataPoint {
   date: string; // formatted date string for the x-axis
   value: number; // the numeric value
   yoyChange: number | null; // year-over-year % change (null if not enough history)
+  population?: number; // optional population overlay value
 }
 
 /** Configuration for one FRED data series. */

@@ -14,6 +14,7 @@ import HousingChart from "./HousingChart";
 interface ChartCardProps {
   config: SeriesConfig;
   data: ChartDataPoint[];
+  populationData?: ChartDataPoint[];
 }
 
 // ----- Chart colors by series type -----
@@ -117,37 +118,77 @@ function getExplainer(seriesId: string): Explainer {
   };
 }
 
-export default function ChartCard({ config, data }: ChartCardProps) {
+// Merge population data into chart data by matching year.
+// Population is annual, so each chart point gets the population for its year.
+function mergePopulation(
+  chartData: ChartDataPoint[],
+  popData: ChartDataPoint[]
+): ChartDataPoint[] {
+  // Build lookup: year -> population value
+  const popByYear: Record<string, number> = {};
+  for (const p of popData) {
+    const year = p.date.slice(0, 4);
+    popByYear[year] = p.value;
+  }
+  return chartData.map((point) => {
+    const year = point.date.slice(0, 4);
+    return { ...point, population: popByYear[year] };
+  });
+}
+
+export default function ChartCard({ config, data, populationData }: ChartCardProps) {
   const [viewMode, setViewMode] = useState<"value" | "yoyChange">("value");
+  const [showPopulation, setShowPopulation] = useState(false);
   const color = getChartColor(config.id);
   const explainer = getExplainer(config.id);
+
+  // Merge population into chart data when the overlay is active
+  const chartData =
+    showPopulation && populationData && populationData.length > 0
+      ? mergePopulation(data, populationData)
+      : data;
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
       {/* Header: title + toggle */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
         <h3 className="text-lg font-semibold text-gray-900">{config.name}</h3>
-        <div className="flex gap-1 bg-gray-100 rounded-lg p-1">
-          <button
-            onClick={() => setViewMode("value")}
-            className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
-              viewMode === "value"
-                ? "bg-white text-gray-900 shadow-sm"
-                : "text-gray-500 hover:text-gray-700"
-            }`}
-          >
-            Level
-          </button>
-          <button
-            onClick={() => setViewMode("yoyChange")}
-            className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
-              viewMode === "yoyChange"
-                ? "bg-white text-gray-900 shadow-sm"
-                : "text-gray-500 hover:text-gray-700"
-            }`}
-          >
-            YoY %
-          </button>
+        <div className="flex items-center gap-2">
+          {/* Population overlay toggle — only shown for county-specific charts */}
+          {populationData && populationData.length > 0 && (
+            <button
+              onClick={() => setShowPopulation(!showPopulation)}
+              className={`px-3 py-1 rounded-md text-xs font-medium transition-colors border ${
+                showPopulation
+                  ? "bg-orange-50 text-orange-700 border-orange-200"
+                  : "text-gray-400 border-gray-200 hover:text-gray-600 hover:border-gray-300"
+              }`}
+            >
+              Population
+            </button>
+          )}
+          <div className="flex gap-1 bg-gray-100 rounded-lg p-1">
+            <button
+              onClick={() => setViewMode("value")}
+              className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
+                viewMode === "value"
+                  ? "bg-white text-gray-900 shadow-sm"
+                  : "text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              Level
+            </button>
+            <button
+              onClick={() => setViewMode("yoyChange")}
+              className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
+                viewMode === "yoyChange"
+                  ? "bg-white text-gray-900 shadow-sm"
+                  : "text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              YoY %
+            </button>
+          </div>
         </div>
       </div>
 
@@ -156,12 +197,13 @@ export default function ChartCard({ config, data }: ChartCardProps) {
         {/* Chart — takes 2/3 of the width on desktop */}
         <div className="lg:col-span-2">
           <HousingChart
-            data={data}
+            data={chartData}
             dataKey={viewMode}
             color={color}
             prefix={config.prefix}
             suffix={config.suffix}
             decimals={config.decimals}
+            showPopulation={showPopulation}
           />
         </div>
 

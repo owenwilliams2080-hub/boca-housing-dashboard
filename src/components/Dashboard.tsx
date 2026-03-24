@@ -14,7 +14,7 @@
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { TimeRange, SeriesData } from "@/types";
+import { TimeRange, SeriesData, ChartDataPoint } from "@/types";
 import { RegionConfig, REGIONS } from "@/lib/series";
 import { fetchSeriesData } from "@/lib/fred";
 import { filterByTimeRange, formatDate } from "@/lib/transforms";
@@ -33,6 +33,7 @@ export default function Dashboard({ region }: DashboardProps) {
   const pathname = usePathname();
   const [seriesMap, setSeriesMap] = useState<Record<string, SeriesData>>({});
   const [timeRange, setTimeRange] = useState<TimeRange>("5Y");
+  const [populationData, setPopulationData] = useState<ChartDataPoint[]>([]);
 
   // ----- Data fetching -----
   const loadAllData = useCallback(async () => {
@@ -43,13 +44,18 @@ export default function Dashboard({ region }: DashboardProps) {
     }
     setSeriesMap(initial);
 
-    // Fetch all series in parallel
-    const results = await Promise.allSettled(
-      region.series.map(async (config) => {
-        const data = await fetchSeriesData(config.id, config.apiPath, config.sourceSeriesId);
-        return { config, data };
-      })
-    );
+    // Fetch all series + population data in parallel
+    const [seriesResults, popResult] = await Promise.all([
+      Promise.allSettled(
+        region.series.map(async (config) => {
+          const data = await fetchSeriesData(config.id, config.apiPath, config.sourceSeriesId);
+          return { config, data };
+        })
+      ),
+      fetchSeriesData(region.populationSeriesId).catch(() => [] as ChartDataPoint[]),
+    ]);
+    setPopulationData(popResult);
+    const results = seriesResults;
 
     // Update state with results
     const updated: Record<string, SeriesData> = {};
@@ -181,11 +187,13 @@ export default function Dashboard({ region }: DashboardProps) {
                   );
                 }
                 if (series.data.length === 0) return null;
+                const isCountySpecific = series.config.id !== "MORTGAGE30US";
                 return (
                   <div key={series.config.id} id={`chart-${series.config.id}`}>
                     <ChartCard
                       config={series.config}
                       data={filterByTimeRange(series.data, timeRange)}
+                      populationData={isCountySpecific ? populationData : undefined}
                     />
                   </div>
                 );

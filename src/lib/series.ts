@@ -20,6 +20,7 @@ export interface RegionConfig {
   name: string;
   description: string;
   series: SeriesConfig[];
+  populationSeriesId: string;
 }
 
 // ----- Series templates -----
@@ -106,6 +107,7 @@ export const REGIONS: RegionConfig[] = [
     slug: "palm-beach",
     name: "Palm Beach County",
     description: "Boca Raton \u2022 West Palm Beach \u2022 Boynton Beach",
+    populationSeriesId: "FLPALM2POP",
     series: [
       hpiSeries("12099", "Palm Beach County"),
       medianPriceSeries("12099", "Palm Beach County"),
@@ -119,6 +121,7 @@ export const REGIONS: RegionConfig[] = [
     slug: "broward",
     name: "Broward County",
     description: "Fort Lauderdale \u2022 Pompano Beach \u2022 Sunrise",
+    populationSeriesId: "FLBROW5POP",
     series: [
       hpiSeries("12011", "Broward County"),
       medianPriceSeries("12011", "Broward County"),
@@ -132,6 +135,7 @@ export const REGIONS: RegionConfig[] = [
     slug: "miami-dade",
     name: "Miami-Dade County",
     description: "Miami \u2022 Miami Beach \u2022 Kendall",
+    populationSeriesId: "FLMIAM6POP",
     series: [
       hpiSeries("12086", "Miami-Dade County"),
       medianPriceSeries("12086", "Miami-Dade County"),

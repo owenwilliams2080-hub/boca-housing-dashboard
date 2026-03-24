@@ -15,6 +15,7 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
+  Legend,
 } from "recharts";
 import { ChartDataPoint } from "@/types";
 import { formatDate, formatValue } from "@/lib/transforms";
@@ -29,6 +30,15 @@ interface HousingChartProps {
   prefix?: string;
   suffix?: string;
   decimals?: number;
+  /** Whether to show the population overlay line */
+  showPopulation?: boolean;
+}
+
+// Format large population numbers: 1,500,000 → "1.5M"
+function formatPopulation(val: number): string {
+  if (val >= 1_000_000) return `${(val / 1_000_000).toFixed(1)}M`;
+  if (val >= 1_000) return `${(val / 1_000).toFixed(0)}K`;
+  return val.toString();
 }
 
 export default function HousingChart({
@@ -38,6 +48,7 @@ export default function HousingChart({
   prefix = "",
   suffix = "",
   decimals = 1,
+  showPopulation = false,
 }: HousingChartProps) {
   // For YoY view, filter out points that don't have a YoY value
   const chartData =
@@ -81,11 +92,14 @@ export default function HousingChart({
     return formatDate(dateStr);
   };
 
+  // Check if any data point has population data
+  const hasPopData = showPopulation && chartData.some((d) => d.population != null);
+
   return (
     <ResponsiveContainer width="100%" height={280}>
       <LineChart
         data={chartData}
-        margin={{ top: 5, right: 45, left: 10, bottom: 5 }}
+        margin={{ top: 5, right: hasPopData ? 70 : 45, left: 10, bottom: 5 }}
       >
         {/* Light grid lines for readability */}
         <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -100,8 +114,9 @@ export default function HousingChart({
           interval={tickInterval}
         />
 
-        {/* Y axis: values */}
+        {/* Y axis: primary values (left side) */}
         <YAxis
+          yAxisId="left"
           tickFormatter={(val: number) =>
             formatValue(val, displayPrefix, displaySuffix, displayDecimals)
           }
@@ -111,12 +126,30 @@ export default function HousingChart({
           width={80}
         />
 
+        {/* Y axis: population (right side) — only when overlay is active */}
+        {hasPopData && (
+          <YAxis
+            yAxisId="right"
+            orientation="right"
+            tickFormatter={formatPopulation}
+            tick={{ fontSize: 11, fill: "#f97316" }}
+            tickLine={false}
+            axisLine={false}
+            width={55}
+          />
+        )}
+
         {/* Tooltip shown on hover */}
         <Tooltip
-          formatter={(val: number) => [
-            formatValue(val, displayPrefix, displaySuffix, displayDecimals),
-            dataKey === "yoyChange" ? "YoY Change" : "Value",
-          ]}
+          formatter={(val: number, name: string) => {
+            if (name === "population") {
+              return [formatPopulation(val), "Population"];
+            }
+            return [
+              formatValue(val, displayPrefix, displaySuffix, displayDecimals),
+              dataKey === "yoyChange" ? "YoY Change" : "Value",
+            ];
+          }}
           labelFormatter={formatDate}
           contentStyle={{
             borderRadius: "8px",
@@ -125,15 +158,44 @@ export default function HousingChart({
           }}
         />
 
-        {/* The actual data line */}
+        {/* Legend — only when population overlay is active */}
+        {hasPopData && (
+          <Legend
+            verticalAlign="top"
+            height={24}
+            formatter={(value: string) =>
+              value === "population" ? "Population" : "Value"
+            }
+          />
+        )}
+
+        {/* The primary data line */}
         <Line
+          yAxisId="left"
           type="monotone"
           dataKey={dataKey}
           stroke={color}
           strokeWidth={2}
-          dot={false} // hide individual dots for cleaner look
-          activeDot={{ r: 4, fill: color }} // show dot on hover
+          dot={false}
+          activeDot={{ r: 4, fill: color }}
+          name={dataKey === "yoyChange" ? "YoY Change" : "Value"}
         />
+
+        {/* Population overlay line — dashed, orange */}
+        {hasPopData && (
+          <Line
+            yAxisId="right"
+            type="monotone"
+            dataKey="population"
+            stroke="#f97316"
+            strokeWidth={2}
+            strokeDasharray="6 3"
+            dot={false}
+            activeDot={{ r: 4, fill: "#f97316" }}
+            name="population"
+            connectNulls
+          />
+        )}
       </LineChart>
     </ResponsiveContainer>
   );
