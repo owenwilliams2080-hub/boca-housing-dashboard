@@ -19,9 +19,9 @@ interface ChartCardProps {
 // Colors for each series — gives visual variety to the dashboard
 const CHART_COLORS: Record<string, string> = {
   ATNHPIUS48424Q: "#3b82f6", // blue — Home Price Index
-  MEDLISPRI48424: "#10b981", // green — Median Listing Price
-  ACTLISCOU48424: "#f59e0b", // amber — Active Listings
-  MEDDAYONMAR48424: "#8b5cf6", // purple — Days on Market
+  MEDLISPRI33100: "#10b981", // green — Median Listing Price
+  ACTLISCOU33100: "#f59e0b", // amber — Active Listings
+  MEDDAYONMAR33100: "#8b5cf6", // purple — Days on Market
   MORTGAGE30US: "#ef4444", // red — Mortgage Rate
 };
 

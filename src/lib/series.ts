@@ -27,7 +27,7 @@ export const FRED_SERIES: SeriesConfig[] = [
     decimals: 1,
   },
   {
-    id: "MEDLISPRI48424",
+    id: "MEDLISPRI33100",
     name: "Median Listing Price",
     description:
       "The middle listing price of homes for sale in the area. Half of all listings are priced above this number and half below — it gives you a realistic sense of what homes cost right now.",
@@ -37,7 +37,7 @@ export const FRED_SERIES: SeriesConfig[] = [
     decimals: 0,
   },
   {
-    id: "ACTLISCOU48424",
+    id: "ACTLISCOU33100",
     name: "Active Listings",
     description:
       "The number of homes currently listed for sale. More listings generally mean more choices for buyers and less pressure on prices. Fewer listings can signal a seller's market.",
@@ -46,7 +46,7 @@ export const FRED_SERIES: SeriesConfig[] = [
     decimals: 0,
   },
   {
-    id: "MEDDAYONMAR48424",
+    id: "MEDDAYONMAR33100",
     name: "Median Days on Market",
     description:
       "How long the typical home sits on the market before going under contract. A lower number means homes are selling quickly (hot market); a higher number means they are sitting longer (cooling market).",
