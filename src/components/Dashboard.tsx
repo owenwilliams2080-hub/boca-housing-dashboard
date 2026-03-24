@@ -43,7 +43,7 @@ export default function Dashboard({ region }: DashboardProps) {
     // Fetch all series in parallel
     const results = await Promise.allSettled(
       region.series.map(async (config) => {
-        const data = await fetchSeriesData(config.id);
+        const data = await fetchSeriesData(config.id, config.apiPath, config.sourceSeriesId);
         return { config, data };
       })
     );
@@ -131,7 +131,7 @@ export default function Dashboard({ region }: DashboardProps) {
         </div>
 
         {/* ===== Stat cards ===== */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
           {isLoading
             ? region.series.map((config) => (
                 <StatCardSkeleton key={config.id} />

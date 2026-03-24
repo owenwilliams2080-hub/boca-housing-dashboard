@@ -19,6 +19,7 @@ interface ChartCardProps {
 // ----- Chart colors by series type -----
 function getChartColor(seriesId: string): string {
   if (seriesId.startsWith("ATNHPIUS")) return "#3b82f6";
+  if (seriesId.startsWith("REAL_MEDLISPRI")) return "#06b6d4";
   if (seriesId.startsWith("MEDLISPRI")) return "#10b981";
   if (seriesId.startsWith("ACTLISCOU")) return "#f59e0b";
   if (seriesId.startsWith("MEDDAYONMAR")) return "#8b5cf6";
@@ -46,6 +47,20 @@ function getExplainer(seriesId: string): Explainer {
       ],
       whyItMatters:
         "This is the best long-term view of whether homes in the area are becoming more or less expensive over time.",
+    };
+  }
+  if (seriesId.startsWith("REAL_MEDLISPRI")) {
+    return {
+      headline: "What is Inflation-Adjusted Listing Price?",
+      bullets: [
+        "Takes the median listing price and removes the effect of inflation",
+        "Uses the Consumer Price Index (CPI) to convert past prices into today's dollars",
+        "If this line is flat, prices only rose because of inflation — not real demand",
+        "If this line is rising, homes are genuinely getting more expensive beyond inflation",
+        "Updated every month",
+      ],
+      whyItMatters:
+        "Shows whether homes are truly getting more expensive, or if rising prices are just the dollar losing value over time.",
     };
   }
   if (seriesId.startsWith("MEDLISPRI")) {

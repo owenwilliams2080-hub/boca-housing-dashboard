@@ -32,6 +32,8 @@ export interface SeriesConfig {
   prefix?: string; // optional prefix like "$" for currency
   suffix?: string; // optional suffix like "%" for rates
   decimals?: number; // how many decimal places to show
+  apiPath?: string; // custom API path for computed series (e.g. "/api/fred/real-price")
+  sourceSeriesId?: string; // the actual FRED series ID to fetch (when id is a display-only key)
 }
 
 /** The time range options for filtering charts. */

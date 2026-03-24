@@ -16,10 +16,19 @@ import { transformObservations } from "./transforms";
  * @returns an array of cleaned, transformed data points
  */
 export async function fetchSeriesData(
-  seriesId: string
+  seriesId: string,
+  apiPath?: string,
+  sourceSeriesId?: string
 ): Promise<ChartDataPoint[]> {
-  // Call our own API route (see src/app/api/fred/route.ts)
-  const response = await fetch(`/api/fred?seriesId=${seriesId}`);
+  // Use custom API path if provided (for computed series like inflation-adjusted),
+  // otherwise use the standard FRED proxy route.
+  // sourceSeriesId overrides seriesId for the API call (used when the display ID
+  // differs from the actual FRED series ID).
+  const fetchId = sourceSeriesId || seriesId;
+  const url = apiPath
+    ? `${apiPath}?seriesId=${fetchId}`
+    : `/api/fred?seriesId=${fetchId}`;
+  const response = await fetch(url);
 
   // If the request failed, throw an error so the UI can show it
   if (!response.ok) {

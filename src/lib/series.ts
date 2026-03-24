@@ -50,6 +50,20 @@ function medianPriceSeries(fips: string, regionName: string): SeriesConfig {
   };
 }
 
+function realPriceSeries(fips: string, regionName: string): SeriesConfig {
+  return {
+    id: `REAL_MEDLISPRI${fips}`,
+    name: "Median Listing Price (Inflation-Adjusted)",
+    description: `The median listing price in ${regionName} adjusted for inflation using the Consumer Price Index (CPI). Shows what homes cost in today's dollars, removing the effect of inflation.`,
+    unit: "USD",
+    frequency: "Monthly",
+    prefix: "$",
+    decimals: 0,
+    apiPath: "/api/fred/real-price",
+    sourceSeriesId: `MEDLISPRI${fips}`,
+  };
+}
+
 function activeListingsSeries(fips: string, regionName: string): SeriesConfig {
   return {
     id: `ACTLISCOU${fips}`,
@@ -95,6 +109,7 @@ export const REGIONS: RegionConfig[] = [
     series: [
       hpiSeries("12099", "Palm Beach County"),
       medianPriceSeries("12099", "Palm Beach County"),
+      realPriceSeries("12099", "Palm Beach County"),
       activeListingsSeries("12099", "Palm Beach County"),
       daysOnMarketSeries("12099", "Palm Beach County"),
       MORTGAGE_SERIES,
@@ -107,6 +122,7 @@ export const REGIONS: RegionConfig[] = [
     series: [
       hpiSeries("12011", "Broward County"),
       medianPriceSeries("12011", "Broward County"),
+      realPriceSeries("12011", "Broward County"),
       activeListingsSeries("12011", "Broward County"),
       daysOnMarketSeries("12011", "Broward County"),
       MORTGAGE_SERIES,
@@ -119,6 +135,7 @@ export const REGIONS: RegionConfig[] = [
     series: [
       hpiSeries("12086", "Miami-Dade County"),
       medianPriceSeries("12086", "Miami-Dade County"),
+      realPriceSeries("12086", "Miami-Dade County"),
       activeListingsSeries("12086", "Miami-Dade County"),
       daysOnMarketSeries("12086", "Miami-Dade County"),
       MORTGAGE_SERIES,
