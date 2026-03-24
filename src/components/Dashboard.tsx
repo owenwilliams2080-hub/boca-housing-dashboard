@@ -15,7 +15,7 @@ import { useState, useEffect, useCallback } from "react";
 import { TimeRange, SeriesData } from "@/types";
 import { RegionConfig } from "@/lib/series";
 import { fetchSeriesData } from "@/lib/fred";
-import { filterByTimeRange } from "@/lib/transforms";
+import { filterByTimeRange, formatDate } from "@/lib/transforms";
 import StatCard from "./StatCard";
 import ChartCard from "./ChartCard";
 import TimeRangeFilter from "./TimeRangeFilter";
@@ -86,6 +86,14 @@ export default function Dashboard({ region }: DashboardProps) {
     !isLoading &&
     seriesList.length > 0 &&
     seriesList.every((s) => s.error !== null);
+
+  // Find the most recent data point across all series to show freshness
+  const latestDate = seriesList.reduce<string | null>((latest, series) => {
+    if (series.data.length === 0) return latest;
+    const lastPoint = series.data[series.data.length - 1].date;
+    if (!latest || lastPoint > latest) return lastPoint;
+    return latest;
+  }, null);
 
   return (
     <>
@@ -172,21 +180,12 @@ export default function Dashboard({ region }: DashboardProps) {
               })}
         </div>
 
-        {/* ===== Footer ===== */}
-        <footer className="mt-12 pt-8 border-t border-gray-200 text-center text-sm text-gray-400">
-          <p>
-            Data provided by the{" "}
-            <a
-              href="https://fred.stlouisfed.org/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline hover:text-gray-600"
-            >
-              Federal Reserve Economic Data (FRED)
-            </a>{" "}
-            &middot; Federal Reserve Bank of St. Louis
-          </p>
-        </footer>
+        {/* ===== Latest data indicator ===== */}
+        {latestDate && (
+          <div className="mt-8 text-center text-xs text-gray-400">
+            Most recent data point: {formatDate(latestDate)}
+          </div>
+        )}
       </main>
     </>
   );
