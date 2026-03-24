@@ -16,20 +16,22 @@ interface ChartCardProps {
   data: ChartDataPoint[];
 }
 
-// Colors for each series — gives visual variety to the dashboard
-const CHART_COLORS: Record<string, string> = {
-  ATNHPIUS48424Q: "#3b82f6", // blue — Home Price Index
-  MEDLISPRI33100: "#10b981", // green — Median Listing Price
-  ACTLISCOU33100: "#f59e0b", // amber — Active Listings
-  MEDDAYONMAR33100: "#8b5cf6", // purple — Days on Market
-  MORTGAGE30US: "#ef4444", // red — Mortgage Rate
-};
+// Colors by series *type* — we match by the prefix of the series ID
+// so the same color is used for "Median Listing Price" regardless of county
+function getChartColor(seriesId: string): string {
+  if (seriesId.startsWith("ATNHPIUS")) return "#3b82f6"; // blue — HPI
+  if (seriesId.startsWith("MEDLISPRI")) return "#10b981"; // green — Median Price
+  if (seriesId.startsWith("ACTLISCOU")) return "#f59e0b"; // amber — Active Listings
+  if (seriesId.startsWith("MEDDAYONMAR")) return "#8b5cf6"; // purple — Days on Market
+  if (seriesId.startsWith("MORTGAGE")) return "#ef4444"; // red — Mortgage Rate
+  return "#3b82f6"; // default blue
+}
 
 export default function ChartCard({ config, data }: ChartCardProps) {
   // Toggle between showing raw values and year-over-year % change
   const [viewMode, setViewMode] = useState<"value" | "yoyChange">("value");
 
-  const color = CHART_COLORS[config.id] || "#3b82f6";
+  const color = getChartColor(config.id);
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">

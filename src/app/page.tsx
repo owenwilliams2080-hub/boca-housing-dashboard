@@ -1,15 +1,11 @@
 // ============================================================
-// Home Page
-// This is the entry point — the page users see when they visit
-// the root URL ("/"). It simply renders the Dashboard component.
-//
-// Why so simple? We keep the page file thin and put all the
-// logic in Dashboard.tsx. This makes it easy to add more pages
-// later without duplicating code.
+// Home Page (root "/")
+// Redirects to the Palm Beach County dashboard by default.
+// This way visitors always land on a region with data.
 // ============================================================
 
-import Dashboard from "@/components/Dashboard";
+import { redirect } from "next/navigation";
 
 export default function HomePage() {
-  return <Dashboard />;
+  redirect("/palm-beach");
 }
