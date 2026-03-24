@@ -120,15 +120,16 @@ function getExplainer(seriesId: string): Explainer {
 
 // Merge population data into chart data by matching year.
 // Population is annual, so each chart point gets the population for its year.
+// FRED returns population in thousands of persons, so we multiply by 1,000.
 function mergePopulation(
   chartData: ChartDataPoint[],
   popData: ChartDataPoint[]
 ): ChartDataPoint[] {
-  // Build lookup: year -> population value
+  // Build lookup: year -> actual population (FRED value × 1,000)
   const popByYear: Record<string, number> = {};
   for (const p of popData) {
     const year = p.date.slice(0, 4);
-    popByYear[year] = p.value;
+    popByYear[year] = Math.round(p.value * 1000);
   }
   return chartData.map((point) => {
     const year = point.date.slice(0, 4);
@@ -160,7 +161,7 @@ export default function ChartCard({ config, data, populationData }: ChartCardPro
               onClick={() => setShowPopulation(!showPopulation)}
               className={`px-3 py-1 rounded-md text-xs font-medium transition-colors border ${
                 showPopulation
-                  ? "bg-orange-50 text-orange-700 border-orange-200"
+                  ? "bg-gray-900 text-white border-gray-900"
                   : "text-gray-400 border-gray-200 hover:text-gray-600 hover:border-gray-300"
               }`}
             >

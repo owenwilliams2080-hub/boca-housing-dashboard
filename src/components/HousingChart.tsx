@@ -34,11 +34,16 @@ interface HousingChartProps {
   showPopulation?: boolean;
 }
 
-// Format large population numbers: 1,500,000 → "1.5M"
+// Format population with commas: 1582055 → "1,582,055"
 function formatPopulation(val: number): string {
-  if (val >= 1_000_000) return `${(val / 1_000_000).toFixed(1)}M`;
+  return val.toLocaleString("en-US");
+}
+
+// Shortened version for Y-axis ticks: 1582055 → "1.58M"
+function formatPopulationTick(val: number): string {
+  if (val >= 1_000_000) return `${(val / 1_000_000).toFixed(2)}M`;
   if (val >= 1_000) return `${(val / 1_000).toFixed(0)}K`;
-  return val.toString();
+  return val.toLocaleString("en-US");
 }
 
 export default function HousingChart({
@@ -95,11 +100,30 @@ export default function HousingChart({
   // Check if any data point has population data
   const hasPopData = showPopulation && chartData.some((d) => d.population != null);
 
+  // Compute a tight domain for the population axis so the line fills the chart
+  // instead of being a flat line at the top or bottom
+  let popDomain: [number, number] | undefined;
+  if (hasPopData) {
+    const popValues = chartData
+      .map((d) => d.population)
+      .filter((v): v is number => v != null);
+    if (popValues.length > 0) {
+      const minPop = Math.min(...popValues);
+      const maxPop = Math.max(...popValues);
+      // Add 10% padding above and below so the line has room to breathe
+      const padding = (maxPop - minPop) * 0.1 || maxPop * 0.02;
+      popDomain = [
+        Math.floor(minPop - padding),
+        Math.ceil(maxPop + padding),
+      ];
+    }
+  }
+
   return (
     <ResponsiveContainer width="100%" height={280}>
       <LineChart
         data={chartData}
-        margin={{ top: 5, right: hasPopData ? 70 : 45, left: 10, bottom: 5 }}
+        margin={{ top: 5, right: hasPopData ? 75 : 45, left: 10, bottom: 5 }}
       >
         {/* Light grid lines for readability */}
         <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -131,11 +155,12 @@ export default function HousingChart({
           <YAxis
             yAxisId="right"
             orientation="right"
-            tickFormatter={formatPopulation}
-            tick={{ fontSize: 11, fill: "#f97316" }}
+            domain={popDomain}
+            tickFormatter={formatPopulationTick}
+            tick={{ fontSize: 11, fill: "#374151" }}
             tickLine={false}
             axisLine={false}
-            width={55}
+            width={65}
           />
         )}
 
@@ -181,17 +206,17 @@ export default function HousingChart({
           name={dataKey === "yoyChange" ? "YoY Change" : "Value"}
         />
 
-        {/* Population overlay line — dashed, orange */}
+        {/* Population overlay line — dashed, black */}
         {hasPopData && (
           <Line
             yAxisId="right"
             type="monotone"
             dataKey="population"
-            stroke="#f97316"
-            strokeWidth={2}
+            stroke="#000000"
+            strokeWidth={1.5}
             strokeDasharray="6 3"
             dot={false}
-            activeDot={{ r: 4, fill: "#f97316" }}
+            activeDot={{ r: 4, fill: "#000000" }}
             name="population"
             connectNulls
           />
