@@ -56,11 +56,20 @@ export default function HousingChart({
   const displayPrefix = dataKey === "yoyChange" ? "" : prefix;
   const displayDecimals = dataKey === "yoyChange" ? 1 : decimals;
 
+  // Smart label count: show fewer labels when there are fewer data points
+  // so they don't bunch up (especially on 1Y view with weekly data).
+  // Target ~5 evenly spaced labels, but never more than the data has.
+  const maxLabels = 5;
+  const tickInterval = Math.max(
+    0,
+    Math.floor(chartData.length / maxLabels) - 1
+  );
+
   return (
     <ResponsiveContainer width="100%" height={280}>
       <LineChart
         data={chartData}
-        margin={{ top: 5, right: 20, left: 10, bottom: 5 }}
+        margin={{ top: 5, right: 20, left: 10, bottom: chartData.length > 20 ? 15 : 5 }}
       >
         {/* Light grid lines for readability */}
         <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -72,8 +81,10 @@ export default function HousingChart({
           tick={{ fontSize: 12, fill: "#9ca3af" }}
           tickLine={false}
           axisLine={{ stroke: "#e5e7eb" }}
-          // Only show ~6 labels so they don't overlap
-          interval={Math.max(0, Math.floor(chartData.length / 6) - 1)}
+          interval={tickInterval}
+          // Angle labels slightly when there are many, and add padding
+          angle={chartData.length > 20 ? -25 : 0}
+          dy={chartData.length > 20 ? 8 : 0}
         />
 
         {/* Y axis: values */}
