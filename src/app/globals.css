@@ -1,0 +1,16 @@
+/* ============================================================
+   Global Styles
+   This file loads Tailwind CSS and adds minimal custom styles.
+   Tailwind does most of the heavy lifting — we just tweak a
+   few defaults here for a polished look.
+   ============================================================ */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Smooth font rendering across browsers */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
