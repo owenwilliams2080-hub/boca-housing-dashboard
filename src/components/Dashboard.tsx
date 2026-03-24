@@ -104,14 +104,14 @@ export default function Dashboard({ region }: DashboardProps) {
       <div className="sticky top-0 z-20 bg-white border-b border-gray-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-2 py-2">
           {/* Region tabs */}
-          <div className="flex items-center gap-1 overflow-x-auto">
+          <div className="flex items-center gap-1">
             {REGIONS.map((r) => {
               const isActive = pathname === `/${r.slug}`;
               return (
                 <Link
                   key={r.slug}
                   href={`/${r.slug}`}
-                  className={`px-3 py-1.5 rounded-md text-sm font-medium whitespace-nowrap transition-colors ${
+                  className={`px-2 py-1.5 rounded-md text-xs font-medium whitespace-nowrap transition-colors ${
                     isActive
                       ? "bg-blue-50 text-blue-700"
                       : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
