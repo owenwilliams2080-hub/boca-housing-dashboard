@@ -12,8 +12,10 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { TimeRange, SeriesData } from "@/types";
-import { RegionConfig } from "@/lib/series";
+import { RegionConfig, REGIONS } from "@/lib/series";
 import { fetchSeriesData } from "@/lib/fred";
 import { filterByTimeRange, formatDate } from "@/lib/transforms";
 import StatCard from "./StatCard";
@@ -28,6 +30,7 @@ interface DashboardProps {
 
 export default function Dashboard({ region }: DashboardProps) {
   // ----- State -----
+  const pathname = usePathname();
   const [seriesMap, setSeriesMap] = useState<Record<string, SeriesData>>({});
   const [timeRange, setTimeRange] = useState<TimeRange>("5Y");
 
@@ -97,15 +100,30 @@ export default function Dashboard({ region }: DashboardProps) {
 
   return (
     <>
-      {/* ===== Region label ===== */}
-      <div className="bg-gray-50 border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-baseline gap-3">
-          <h2 className="text-lg font-semibold text-gray-900">
-            {region.name}
-          </h2>
-          <span className="text-sm text-gray-400">
-            {region.description}
-          </span>
+      {/* ===== Compact sticky bar: region tabs (left) + time range (right) ===== */}
+      <div className="sticky top-0 z-20 bg-white border-b border-gray-200 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-2 py-2">
+          {/* Region tabs */}
+          <div className="flex items-center gap-1 overflow-x-auto">
+            {REGIONS.map((r) => {
+              const isActive = pathname === `/${r.slug}`;
+              return (
+                <Link
+                  key={r.slug}
+                  href={`/${r.slug}`}
+                  className={`px-3 py-1.5 rounded-md text-sm font-medium whitespace-nowrap transition-colors ${
+                    isActive
+                      ? "bg-blue-50 text-blue-700"
+                      : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
+                  }`}
+                >
+                  {r.name}
+                </Link>
+              );
+            })}
+          </div>
+          {/* Time range buttons */}
+          <TimeRangeFilter selected={timeRange} onChange={setTimeRange} />
         </div>
       </div>
 
@@ -119,16 +137,6 @@ export default function Dashboard({ region }: DashboardProps) {
             />
           </div>
         )}
-
-        {/* ===== Time range filter (sticky — stays visible while scrolling) ===== */}
-        <div className="sticky top-[45px] z-10 bg-gray-50 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 py-4 -mt-4 mb-4 border-b border-gray-200">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <h2 className="text-lg font-semibold text-gray-700">
-              Market Overview
-            </h2>
-            <TimeRangeFilter selected={timeRange} onChange={setTimeRange} />
-          </div>
-        </div>
 
         {/* ===== Stat cards ===== */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">

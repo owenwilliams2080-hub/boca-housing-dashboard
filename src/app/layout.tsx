@@ -7,7 +7,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import RegionNav from "@/components/RegionNav";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -47,9 +46,6 @@ export default function RootLayout({
               </p>
             </div>
           </div>
-
-          {/* Region tabs — always visible */}
-          <RegionNav />
 
           {/* Page content (the active region's dashboard) */}
           {children}
