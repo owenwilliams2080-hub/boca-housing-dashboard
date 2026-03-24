@@ -69,12 +69,12 @@ export default function HousingChart({
     <ResponsiveContainer width="100%" height={280}>
       <LineChart
         data={chartData}
-        margin={{ top: 5, right: 20, left: 10, bottom: chartData.length > 20 ? 15 : 5 }}
+        margin={{ top: 5, right: 45, left: 10, bottom: 5 }}
       >
         {/* Light grid lines for readability */}
         <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
 
-        {/* X axis: dates */}
+        {/* X axis: dates — always flat, never angled */}
         <XAxis
           dataKey="date"
           tickFormatter={formatDate}
@@ -82,9 +82,6 @@ export default function HousingChart({
           tickLine={false}
           axisLine={{ stroke: "#e5e7eb" }}
           interval={tickInterval}
-          // Angle labels slightly when there are many, and add padding
-          angle={chartData.length > 20 ? -25 : 0}
-          dy={chartData.length > 20 ? 8 : 0}
         />
 
         {/* Y axis: values */}
